@@ -161,18 +161,7 @@ def schema() -> dict[str, Any]:
 
 @app.post("/predict")
 def predict(
-    customer: dict[str, Any] = Body(
-        ...,
-        example={
-            "gender": "Female",
-            "SeniorCitizen": 0,
-            "Partner": "Yes",
-            "Dependents": "No",
-            "tenure": 12,
-            "PhoneService": "Yes",
-            "MonthlyCharges": 75.5,
-        },
-    ),
+    customer: dict[str, Any] = Body(...),
 ) -> dict[str, Any]:
     """Validate customer fields and return a churn prediction."""
     bundle = get_model_bundle()
