@@ -160,6 +160,7 @@ customer-churn-prediction/
 ├── model/
 │   └── churn_pipeline.pkl
 │
+├── download_data.py
 ├── train_model.py
 ├── api.py
 ├── app.py
@@ -173,10 +174,10 @@ customer-churn-prediction/
 | File or folder | Purpose |
 |---|---|
 | `data/` | Stores the dataset used for training, subject to the dataset's licence and privacy requirements |
-| `data/customers.csv` | Example location for the historical customer data |
+| `data/customers.csv` | Local copy of the IBM Telco Customer Churn sample dataset, downloaded by `download_data.py` |
 | `model/` | Stores the trained model pipeline |
-| `model/churn_pipeline.pkl` | Example saved pipeline filename; created after successful training |
-| `train_model.py` | Contains the Python functions for loading data, preparing features, training, evaluating, and saving the pipeline |
+| `model/churn_pipeline.joblib` | Saved preprocessing-and-model pipeline; created after successful training |
+| `download_data.py` | Downloads and validates the public IBM Telco Customer Churn sample dataset |\n| `train_model.py` | Contains the Python functions for loading data, preparing features, training, evaluating, and saving the pipeline |
 | `api.py` | Defines the FastAPI application and prediction endpoint |
 | `app.py` | Defines the Streamlit user interface |
 | `requirements.txt` | Lists the Python packages required to run the project |
@@ -359,15 +360,17 @@ requests
 
 These are package names, not pinned production versions. Once the project is tested, record compatible versions in `requirements.txt` for repeatable installation.
 
-### Step 4: Add the dataset
+### Step 4: Download the dataset
 
-Place the selected dataset at the path expected by `train_model.py`, for example:
+From the project root, run:
 
-```text
-data/customers.csv
+```bash
+python download_data.py
 ```
 
-Check the dataset documentation to identify the actual target column, feature names, label values, and any columns that should be excluded. The code must use the real schema rather than assume every churn dataset has identical columns.
+This downloads the public IBM Telco Customer Churn sample dataset and validates that it contains the expected `Churn` target before saving it to `data/customers.csv`. The sample represents a fictional telecommunications provider and is intended for learning. See the source repository: https://github.com/IBM/telco-customer-churn-on-icp4d.
+
+If you use a different dataset, place it at `data/customers.csv` and check its documentation for the target column, feature names, label values, and columns that should be excluded.
 
 ### Step 5: Train the model
 
@@ -377,7 +380,7 @@ Run:
 python train_model.py
 ```
 
-The script should print useful evaluation results and save the fitted pipeline at the configured path, such as `model/churn_pipeline.pkl`.
+The script prints test-set evaluation results and saves the fitted pipeline to `model/churn_pipeline.joblib`.
 
 If training fails, check the dataset path, target column, input column names, missing values, and package versions.
 
@@ -461,7 +464,7 @@ An API allows two software components to communicate using a defined request and
 | Method | Endpoint | Purpose |
 |---|---|---|
 | `GET` | `/` | Optional welcome or service information |
-| `GET` | `/health` | Optional check that the service and model are available |
+| `GET` | `/health` | Check whether the service and model are available |\n| `GET` | `/schema` | Return the feature names and category choices required by the trained model |
 | `POST` | `/predict` | Accept customer features and return a prediction |
 
 These endpoints are recommendations. They are available only if implemented in `api.py`.
